@@ -4,6 +4,8 @@ This drupal 8 & 9 module can be used to synchronize (add, update and remove auto
 
 All you have to do is map the fields or the origin with its destination via the interface. 
 
+![API manager drupal 8](https://i.imgur.com/qEYfy3H.jpg)
+
 ### Features
 
 - Synchronize items to <b>nodes</b> or <b>tags</b>.
