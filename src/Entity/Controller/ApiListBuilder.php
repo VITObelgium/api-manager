@@ -127,18 +127,28 @@ class ApiListBuilder extends EntityListBuilder {
     $langcode = $entity->get('api_destination_language');
     $bundle = $entity->get('api_destination_entity');
 
-    $nids = \Drupal::entityQuery('node')
-      ->condition('langcode', $langcode)
-      ->condition($api_sync_field, '', '<>')
-      ->condition('type', $bundle)
-      ->execute();
-
+    $type = ApiManagerDetermineEntityType($bundle);
+    switch($type) {
+      case 'node':
+        $ids = \Drupal::entityQuery('node')
+          ->condition('langcode', $langcode)
+          ->condition($api_sync_field, '', '<>')
+          ->condition('type', $bundle)
+          ->execute();
+        break;
+      case 'taxonomy':
+        $ids = \Drupal::entityQuery('taxonomy_term')
+          ->condition($api_sync_field, '', '<>')
+          ->condition('vid', $bundle, '=')
+          ->execute();
+        break;
+    }
 
     $row['name'] = $entity->label();
     $row['api_destination_entity'] = $entity->get('api_destination_entity');
     $row['weight'] = $entity->get('api_manager_weight');
     $row['active'] = ($entity->get('api_manager_active') === true) ? 'Yes' : 'No';
-    $row['items_in_sync'] = count($nids);
+    $row['items_in_sync'] = count($ids);
 
     $status = \Drupal::state()->get('api_manager_status_'.$entity->id(), 'ok');
     if($status === 'ok') {
