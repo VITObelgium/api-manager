@@ -1,0 +1,8 @@
+name: API manager
+type: module
+description: Manage API mapping via interface
+core: 8.x
+package: API Manager
+dependencies:
+  - drupal:image
+  - drupal:node

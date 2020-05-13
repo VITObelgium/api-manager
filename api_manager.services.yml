@@ -1,0 +1,5 @@
+services:
+  api_manager.commands:
+    class: \Drupal\api_manager\Commands\SyncCommands
+    tags:
+      - { name: drush.command }

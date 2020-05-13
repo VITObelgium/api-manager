@@ -1,0 +1,33 @@
+# Define the 'local' links for the module
+
+api.settings_tab:
+  route_name: api_manager.api_settings
+  title: Settings
+  base_route: api_manager.api_settings
+
+api.view:
+  route_name: entity.api_manager.canonical
+  base_route: entity.api_manager.canonical
+  title: View
+
+api.page_edit:
+  route_name: entity.api_manager.edit_form
+  base_route: entity.api_manager.canonical
+  title: Edit
+
+api.page_import:
+  route_name: entity.api_manager.import_form
+  base_route: entity.api_manager.canonical
+  title: Import
+
+api.page_bulkdelete:
+  route_name: entity.api_manager.bulkdelete_form
+  base_route: entity.api_manager.canonical
+  title: Delete imported items
+
+api.delete_confirm:
+  route_name:  entity.api_manager.delete_form
+  base_route:  entity.api_manager.canonical
+  title: Delete
+  weight: 10
+

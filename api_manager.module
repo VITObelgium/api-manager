@@ -1,0 +1,367 @@
+<?php
+
+use Drupal\api_manager\ApiManager;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\Entity\Node;
+use Drupal\taxonomy\Entity\Term;
+
+/**
+ * Implements hook_cron().
+ */
+function api_manager_cron() {
+  $import = new ApiManager;
+  $import->startJobs();
+}
+
+/**
+ * @param $form
+ * @param FormStateInterface $form_state
+ * @param $form_id
+ * Labels of exposed form improvement
+ */
+function api_manager_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  /**
+   * For the sake of not being confusing, hide the entity language parameter.
+   */
+  if ($form_id === 'api_manager_form') {
+    $form['langcode']['#access'] = false;
+  }
+}
+
+/**
+ * Implements hook_entity_delete
+ * Update status message
+ */
+function api_manager_entity_delete(Drupal\Core\Entity\EntityInterface $entity) {
+  if($entity->bundle() === 'api_manager') {
+    \Drupal::state()->set('api_manager_'.$entity->id() , 'Ready to start importing.');
+  }
+}
+
+/**
+ * Parse structure in datafields
+ *
+ * @param  string $apiLevel    api key value
+ * @param  string $entityField node field machine name
+ * @return string $datastructure
+ */
+function ApiManagerParseApiStructure($apiLevel, $entityField, $item) {
+  $returnValue = '';
+  if (strpos($apiLevel, ".") !== false) {
+    $apiLevelParts = explode('.', $apiLevel);
+    foreach ($apiLevelParts as $Part) {
+      if ($returnValue) {
+        $returnValue = $returnValue[$Part];
+      }
+      else {
+        $returnValue = $item[$Part];
+      }
+    }
+  }
+  else {
+    if (array_key_exists($apiLevel, $item)) {
+      $returnValue = $item[$apiLevel];
+    }
+    else {
+      //self::status['error']++;
+      return ApiManagerLogError(
+        t(
+          'Key "%key" not detected in API on item %item. Make sure fields are correctly mapped.', [
+            '%key' => $apiLevel,
+            //'%item' => self::activeCurrentItem
+          ]
+        )
+      );
+    }
+  }
+  return $returnValue;
+}
+
+/**
+ * Parse pipe separated and newlines from datafields
+ *
+ * @param  string $field    field value
+ * @param  string $fieldkey identifier
+ * @return array $datastructure
+ */
+function ApiManagerParseApiFields($field, $fieldkey) {
+  $datastructure = [];
+  $newlines = explode(PHP_EOL, $field);
+  foreach ($newlines as $line) {
+    $structure = explode('|', $line);
+    if(strlen($structure[0]) < 1) {
+      //self::status['error']++;
+      return ApiManagerLogError(
+        t(
+          'Wrong markup detected in datastructure of field: %field.', [
+            '%field' => $fieldkey,
+          ]
+        )
+      );
+    }
+    if (strlen($structure[1]) < 1) {
+      //self::status['error']++;
+      return ApiManagerLogError(
+        t(
+          'Wrong markup detected in datastructure of field: %field.', [
+            '%field' => $fieldkey,
+          ]
+        )
+      );
+    }
+    $datastructure[$structure[0]] = preg_replace("/[\n\r]/", "", $structure[1]);
+  }
+  return $datastructure;
+}
+
+/**
+ * Set error.
+ *
+ * @param string          $msg
+ *   Message string.
+ * @param \Exception|null $e
+ *   Error exception.
+ *
+ * @return bool
+ *   Always false.
+ */
+function ApiManagerLogError($msg = 'No message given', $e = null) {
+  \Drupal::logger('api_manager')->error($msg);
+  $currentOps = \Drupal::state()->get('api_manager_current_batch', 0);
+  $error = \Drupal::state()->get('api_manager_current_batch_' . $currentOps . '_error');
+  \Drupal::state()->set('api_manager_current_batch_' . $currentOps . '_error', $error + 1);
+  if ($e instanceof \Exception) {
+    ApiManagerLogexception($e);
+  }
+  return false;
+}
+
+/**
+ * Set exception.
+ *
+ * @param \Exception $e
+ *   Exception object.
+ *
+ * @return bool
+ *   Always false.
+ */
+function ApiManagerLogException(\Exception $e) {
+  watchdog_exception('api_manager', $e);
+  return false;
+}
+
+/**
+ * Helper function to import external file and make it a managed drupal file
+ *
+ * @param $url
+ *  The file name + location
+ * @param $external
+ *  The external host
+ *
+ * @return $fid
+ *    The file id
+ */
+function ApiManagerFetchExternalFile($url, $external) {
+
+  $directory = 'public://api_manager';
+  $source = $external . $url;
+
+  if (is_array($source)) {
+    return ApiManagerLogError(
+      t(
+        'Api key for file or image not mapped correctly. Array was given instead of url', [
+          '%url' => $source,
+        ]
+      )
+    );
+  }
+  try {
+    \Drupal::httpClient()->get($source);
+  }
+  catch (\Exception $e) {
+    return ApiManagerLogError(
+      t(
+        'Could not get file or image on item %item. url: %url.', [
+          '%url' => $source
+        ]
+      ), $e
+    );
+  }
+
+  if (file_prepare_directory($directory, FILE_CREATE_DIRECTORY)) {
+    $newfile = system_retrieve_file(trim($source), $directory, true);
+    return $newfile;
+  }
+
+  return false;
+}
+
+/**
+ * Helper function to determine entity type of machine name
+ *
+ * @param  string $machineName machine name of the entity type
+ * @return string $entityType The entity type: node or taxonomy
+ */
+function ApiManagerDetermineEntityType($machineName) {
+  // Map content type field for the api.
+  $types = \Drupal::entityTypeManager()
+    ->getStorage('node_type')
+    ->loadMultiple();
+  $entityTypes = [];
+
+  foreach ($types as $entityType) {
+    $entityTypes['node'][] = $entityType->id();
+  }
+  $vocabularies = taxonomy_vocabulary_get_names();
+  foreach ($vocabularies as $vocabulary) {
+    $voc = taxonomy_vocabulary_load($vocabulary);
+    $entityTypes['taxonomy'][] = $voc->id();
+  }
+  if (in_array($machineName, $entityTypes['node'])) {
+    return 'node';
+  }
+  if (in_array($machineName, $entityTypes['taxonomy'])) {
+    return 'taxonomy';
+  }
+  return ApiManagerLogError(
+    t(
+      'Destination entity %machineName not found, was it removed?', [
+        '%machineName' => machineName
+      ]
+    )
+  );
+  return null;
+}
+
+/**
+ * Set result message.
+ *
+ * @param string $type
+ *   Sync type.
+ * @param string $type
+ *   Name of the import.
+ * @param int    $total
+ *  Total items of the api items
+ * @param boolean $setStatusUpdate
+ *  When the result is set by the api, set the update status
+ */
+function ApiManagerSetResult($id, $type) {
+
+  $new = \Drupal::state()->get('api_manager_current_batch_'.$id.'_new', 0);
+  $updated = \Drupal::state()->get('api_manager_current_batch_'.$id.'_updated', 0);
+  $skipped = \Drupal::state()->get('api_manager_current_batch_'.$id.'_skipped', 0);
+  $deleted = \Drupal::state()->get('api_manager_current_batch_'.$id.'_deleted', 0);
+  $error = \Drupal::state()->Get('api_manager_current_batch_'.$id.'_error', 0);
+
+  $total = \Drupal::state()->set('api_manager_current_batch_'.$id.'_total', 0);
+
+  $last_run = \Drupal::state()->get('api_manager_last_check_' . $id, 0);
+
+  $msg = t(
+    'Sync done of %total requested items at %time.<br> New: %new. Updated: %updated. Skipped: %skipped. Deleted: %deleted. Errors: %error', [
+      '%type' => $type,
+      '%time' => date('Y-m-d H:i:s', $last_run),
+      '%new' => $new,
+      '%updated' => $updated,
+      '%error' =>  $error,
+      '%skipped' => $skipped,
+      '%total' => $total,
+      '%deleted' => $deleted,
+    ]
+  );
+
+  if($new == 0 && $updated == 0 && $skipped == 0 && $deleted == 0 && $error == 0) {
+    $msg = 'Ready to start importing';
+  }
+
+  if (\Drupal::state()->get('api_manager_current_batch_' . $id . '_error', 0) > 0) {
+    \Drupal::logger('api_manager')->error($msg);
+    \Drupal::state()->set('api_manager_'.$id, $msg);
+  }
+  else {
+    \Drupal::state()->set('api_manager_'.$id, $msg);
+    \Drupal::logger('api_manager')->notice($msg);
+  }
+
+  if(\Drupal::state()->get('api_manager_current_batch_' . $id . '_error', 0) > 0) {
+    \Drupal::state()->set('api_manager_status_'.$id, 'error');
+  } else {
+    \Drupal::state()->set('api_manager_status_'.$id, 'ok');
+  }
+
+}
+
+
+/**
+ * Get local nodes of a content type.
+ *
+ * @param string $type The content type
+ * @param string $api_sync_field The field name of the sync id
+ * @param string $entityType The type of Entity e.g. taxonomy or node
+ * @param string $bundle The bundle e.g. content type, vid
+ */
+function ApiManagerLoadLocalContent($langcode, $api_sync_field, $entityType, $bundle) {
+
+  $localContent = [];
+
+  switch ($entityType) {
+    case 'node':
+      $nids = \Drupal::entityQuery('node')
+        ->condition('langcode', $langcode)
+        ->condition($api_sync_field, '', '<>')
+        ->condition('type', $bundle)
+        ->execute();
+
+      if ($nids && $entities = Node::loadMultiple($nids)) {
+        /**
+         * @var \Drupal\node\Entity\Node $entity
+         */
+        foreach ($entities as $entity) {
+          if (isset($localContent[$entity->{$api_sync_field}->value])) {
+            ApiManagerLogError(
+              t(
+                'Duplicate item id in use, please remove node id: %id', [
+                  '%id' => $entity->id(),
+                ]
+              )
+            );
+          }
+          else {
+            $localContent[$entity->{$api_sync_field}->value] = $entity;
+          }
+        }
+
+      }
+      break;
+    case 'taxonomy':
+      $tids = \Drupal::entityQuery('taxonomy_term')
+        ->condition($api_sync_field, '', '<>')
+        ->condition('vid', $bundle, '=')
+        ->execute();
+
+      if ($tids && $tags = Term::loadMultiple($tids)) {
+
+        /**
+         * @var \Drupal\node\Entity\Node $node
+         */
+        foreach ($tags as $tag) {
+          if (isset($localContent[$tag->{$api_sync_field}->value])) {
+            ApiManagerLogError(
+              t(
+                'Duplicate item id in use, please remove tag with id: %id', [
+                  '%id' => $tag->id(),
+                ]
+              )
+            );
+          }
+          else {
+            $localContent[$tag->{$api_sync_field}->value] = $tag;
+          }
+        }
+
+      }
+      break;
+  }
+  return $localContent;
+
+}

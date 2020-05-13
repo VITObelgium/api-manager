@@ -1,0 +1,99 @@
+# This file brings everything together. Very nifty!
+
+# Route name can be used in several places; e.g. links, redirects, and local
+# actions.
+entity.api_manager.canonical:
+  path: '/admin/api_manager/{api_manager}'
+  defaults:
+    # Calls the view controller, defined in the annotation of the api
+    # entity. This marks this route as belonging to this entity type.
+    _entity_view: 'api_manager'
+    _title: 'Api content'
+  requirements:
+    # Calls the access controller of the entity, passing in the suffix ('view')
+    # as the $operation parameter to checkAccess().
+    _entity_access: 'api_manager.view'
+
+entity.api_manager.collection:
+  path: '/admin/api_manager/list'
+  defaults:
+  # Calls the list controller, defined in the annotation of the api entity.
+    _entity_list: 'api_manager'
+    _title: 'Api list'
+  requirements:
+  # Checks for permission directly.
+    _permission: 'view api entity'
+
+api_manager.api_add:
+  path: '/admin/api_manager/add'
+  defaults:
+    # Calls the form.add controller, defined in the api entity.
+    _entity_form: api_manager.default
+    _title: 'Add api'
+  requirements:
+    # Use the entity's access controller. _entity_create_access tells the router
+    # to use the access controller's checkCreateAccess() method instead of
+    # checkAccess().
+    _entity_create_access: 'api_manager'
+
+entity.api_manager.edit_form:
+  path: '/admin/api_manager/{api_manager}/edit'
+  defaults:
+  # Calls the form.edit controller, defined in the api entity.
+    _entity_form: api_manager.default
+    _title: 'Edit api'
+  requirements:
+    # Calls the access controller of the entity, passing in the suffix
+    # ('update') as the $operation parameter to checkAccess().
+    _entity_access: 'api_manager.update'
+
+entity.api_manager.delete_form:
+  path: '/admin/api/{api_manager}/delete'
+  defaults:
+    # Calls the form.delete controller, defined in the api entity.
+    _entity_form: api_manager.delete
+    _title: 'Delete api'
+  requirements:
+    # Calls the access controller of the entity, passing in the suffix
+    # ('delete') as the $operation parameter to checkAccess().
+    _entity_access: 'api_manager.delete'
+
+entity.api_manager.import_form:
+  path: '/admin/api/{api_manager}/import'
+  defaults:
+    # Calls the form.import controller, defined in the api entity.
+    _entity_form: api_manager.import
+    _title: 'Import api items'
+  requirements:
+    # Calls the access controller of the entity, passing in the suffix
+    # ('delete') as the $operation parameter to checkAccess().
+    _entity_access: 'api_manager.import'
+
+entity.api_manager.bulkdelete_form:
+  path: '/admin/api/{api_manager}/bulkdelete'
+  defaults:
+    # Calls the form.bulkdelete controller, defined in the api entity.
+    _entity_form: api_manager.bulkdelete
+    _title: 'Delete imported items'
+  requirements:
+    # Calls the access controller of the entity, passing in the suffix
+    # ('bulkdelete') as the $operation parameter to checkAccess().
+    _entity_access: 'api_manager.bulkdelete'
+
+api_manager.api_settings:
+  path: '/admin/structure/admin/api_manager_settings'
+  defaults:
+    _form: '\Drupal\api_manager\Form\ApiSettingsForm'
+    _title: 'Api settings'
+  requirements:
+    _permission: 'administer api entity'
+
+api_manager.trigger:
+  path: '/admin/api/trigger/{uuid}'
+  defaults:
+    _title: 'Trigger api call'
+    _controller: '\Drupal\api_manager\Controller\externalTrigger::receive'
+  requirements:
+    _permission: 'access content'
+  options:
+    no_cache: 'TRUE'

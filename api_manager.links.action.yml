@@ -1,0 +1,10 @@
+# All action links for this module
+
+api_manager.api_add:
+  # Which route will be called by the link
+  route_name: api_manager.api_add
+  title: 'Add api'
+  # Where will the link appear, defined by route name.
+  appears_on:
+    - entity.api_manager.collection
+    - entity.api_manager.canonical

@@ -1,0 +1,17 @@
+{
+    "name": "drupal/drush9",
+    "description": "A module for Drush 9 commands.",
+    "type": "drupal-module",
+    "autoload": {
+        "psr-4": {
+            "Drupal\\api_manager\\": "src/"
+        }
+    },
+    "extra": {
+        "drush": {
+            "services": {
+                "drush.services.yml": "^9"
+            }
+        }
+    }
+}

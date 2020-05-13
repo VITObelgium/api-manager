@@ -1,0 +1,11 @@
+# Define the menu links for this module
+
+entity.api_manager.collection:
+  title: 'API manager'
+  route_name: entity.api_manager.collection
+  description: 'List APIs'
+api_manager.admin.structure.settings:
+  title: 'API manager'
+  description: 'Configure APIs'
+  route_name:  entity.api_manager.collection
+  parent: system.admin_structure

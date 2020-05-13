@@ -1,0 +1,12 @@
+'delete api entity':
+  title: Delete entity content.
+'import api entity':
+  title: Import entity content.
+'add api entity':
+  title: Add entity content
+'view api entity':
+  title: View entity content
+'edit api entity':
+  title: Edit entity content
+'administer api entity':
+  title: Administer settings

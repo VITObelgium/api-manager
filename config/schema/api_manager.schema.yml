@@ -1,0 +1,67 @@
+api_manager.*:
+  type: config_entity
+  label: 'Api Manager config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    api_url:
+      type: string
+      label: 'Api url'
+    api_user_id:
+      type: integer
+      label: 'Import user id'
+    api_destination_entity:
+      type: string
+      label: 'Destination entity'
+    api_sync_field:
+      type: string
+      label: 'Api sync field'
+    api_unique_id:
+      type: string
+      label: 'Api unique id'
+    api_updated_identifier:
+      type: string
+      label: 'Api update identifier'
+    api_taxonomy_parent:
+      type: string
+      label: 'Api taxonomy parent'
+    api_type:
+      type: string
+      label: 'Api type'
+    api_destination_language:
+      type: string
+      label: 'Api destination language'
+    api_minutes:
+      type: string
+      label: 'Api interval'
+    api_manager_textfield:
+      type: string
+      label: 'Regular textfield mapping'
+    api_manager_textarea:
+      type: string
+      label: 'Textarea mapping'
+    api_manager_image:
+      type: string
+      label: 'Images mapping'
+    api_manager_entity:
+      type: string
+      label: 'Entity reference mapping'
+    api_manager_integer:
+      type: string
+      label: 'Integer mapping'
+    api_manager_geolocation:
+      type: string
+      label: 'Geolocation mapping'
+    api_manager_date:
+      type: string
+      label: 'Dates mapping'
+    api_manager_weight:
+      type: string
+      label: 'Weight'
+    api_manager_active:
+      type: boolean
+      label: 'Active'
