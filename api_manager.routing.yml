@@ -58,17 +58,6 @@ entity.api_manager.delete_form:
     # ('delete') as the $operation parameter to checkAccess().
     _entity_access: 'api_manager.delete'
 
-entity.api_manager.import_form:
-  path: '/admin/api/{api_manager}/import'
-  defaults:
-    # Calls the form.import controller, defined in the api entity.
-    _entity_form: api_manager.import
-    _title: 'Import api items'
-  requirements:
-    # Calls the access controller of the entity, passing in the suffix
-    # ('delete') as the $operation parameter to checkAccess().
-    _entity_access: 'api_manager.import'
-
 entity.api_manager.bulkdelete_form:
   path: '/admin/api/{api_manager}/bulkdelete'
   defaults:
