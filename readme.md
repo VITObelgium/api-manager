@@ -4,7 +4,7 @@ This drupal 8 & 9 module can be used to synchronize (add, update and remove auto
 
 All you have to do is map the fields or the origin with its destination via the interface. 
 
-###Features
+### Features
 
 - Synchronize items to <b>nodes</b> or <b>tags</b>.
 - Possibility to <b>cross-link</b> items with entity reference.
@@ -16,7 +16,7 @@ All you have to do is map the fields or the origin with its destination via the 
 #### Not included
 
 - Do not use this module if you would like to sync tens of thousands of items. It is meant for <b>small to medium-sized</b> datasets (e.g. up to 10.000). Nevertheless, you could give it a try. 
-- Authorisation. Deliberately we did <b>not include any type of authorisation</b>. This means server needs direct access to the JSON url. Read further documentation on how you can put your own authorisation easily. 
+- Authorisation. Deliberately we did <b>not include any type of authorisation</b>. This means server needs direct access to the JSON url. So if your data is behind some kind of security wall: create a custom controller to make your JSON available and let Api Manager handle the synchronisation. 
 - Although it is possible to choose target language, <b>importing translations of a node are not possible</b>. Though it is possible to cross-link with entity reference.
 
 #### Future roadmap
