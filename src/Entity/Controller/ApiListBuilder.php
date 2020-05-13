@@ -58,7 +58,7 @@ class ApiListBuilder extends EntityListBuilder {
    */
   public function render() {
     $build['description'] = [
-      '#markup' => $this->t('The sync require cron to be functional. It is recommended to set cron to run every 10 minutes.', [
+      '#markup' => $this->t('The sync require cron to be functional OR you can disable importing on cron in the "interval" field to make use of external triggers', [
         '@adminlink' => $this->urlGenerator->generateFromRoute('api_manager.api_settings'),
       ]),
     ];
