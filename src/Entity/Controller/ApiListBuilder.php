@@ -79,14 +79,6 @@ class ApiListBuilder extends EntityListBuilder {
   protected function getDefaultOperations(EntityInterface $entity) {
     $operations = parent::getDefaultOperations($entity);
 
-    if ($entity->access('import') && $entity->hasLinkTemplate('import-form')) {
-      $operations['import'] = array(
-        'title' => $this->t('Run import'),
-        'weight' => 30,
-        'url' => $this->ensureDestination($entity->toUrl('import-form')),
-      );
-    }
-
     if ($entity->access('view') && $entity->hasLinkTemplate('bulkdelete-form')) {
       $operations['bulkdelete'] = array(
         'title' => $this->t('Delete imported'),

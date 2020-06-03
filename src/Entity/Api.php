@@ -18,7 +18,6 @@ use Drupal\api_manager\ApiInterface;
  *     "form" = {
  *       "default" = "Drupal\api_manager\Form\ApiForm",
  *       "delete" = "Drupal\api_manager\Form\ApiDeleteForm",
- *       "import" = "Drupal\api_manager\Form\ApiImportForm",
  *       "bulkdelete" = "Drupal\api_manager\Form\ApiBulkdeleteForm",
  *     },
  *     "access" = "Drupal\api_manager\ApiAccessControlHandler",
@@ -85,7 +84,6 @@ use Drupal\api_manager\ApiInterface;
  *     "canonical" = "/api_manager/{api_manager}",
  *     "edit-form" = "/api_manager/{api_manager}/edit",
  *     "delete-form" = "/api/{api_manager}/delete",
- *     "import-form" = "/api/{api_manager}/import",
  *     "bulkdelete-form" = "/api/{api_manager}/bulkdelete",
  *     "collection" = "/api_manager/list"
  *   },
