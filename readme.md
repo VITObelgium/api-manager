@@ -38,12 +38,12 @@ With composer, add the following to your repositories:
             "type": "package",
             "package": {
                 "name": "VITObelgium/api-manager",
-                "version": "1.0",
+                "version": "master",
                 "type":"drupal-module",
                 "source": {
                     "url": "https://github.com/VITObelgium/api-manager.git",
                     "type": "git",
-                    "reference": "1.0"
+                    "reference": "master"
                 }
             }
         }
