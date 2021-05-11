@@ -16,7 +16,7 @@ api.page_edit:
   title: Edit
 
 api.page_import:
-  route_name: entity.api_manager.import_form
+  route_name: entity.api_manager.edit_form
   base_route: entity.api_manager.canonical
   title: Import
 

@@ -97,9 +97,9 @@ class ApiForm extends EntityForm {
       $Types[$AvailableType->id()] = $AvailableType->label() . ' (node)';
     }
     $vocabularies = taxonomy_vocabulary_get_names();
-    foreach($vocabularies as $vocabulary) {
-      $voc = taxonomy_vocabulary_load($vocabulary);
-      $Types[$vocabulary] = $voc->label()  . ' (taxonomy)';
+    foreach($vocabularies as $vid) {
+      $voc =  \Drupal\taxonomy\Entity\Vocabulary::load($vid);
+      $Types[$vid] = $voc->label()  . ' (taxonomy)';
     }
 
     $form['api_destination_entity'] = [

@@ -213,8 +213,8 @@ function ApiManagerDetermineEntityType($machineName) {
     $entityTypes['node'][] = $entityType->id();
   }
   $vocabularies = taxonomy_vocabulary_get_names();
-  foreach ($vocabularies as $vocabulary) {
-    $voc = taxonomy_vocabulary_load($vocabulary);
+  foreach ($vocabularies as $vid) {
+    $voc =  \Drupal\taxonomy\Entity\Vocabulary::load($vid);
     $entityTypes['taxonomy'][] = $voc->id();
   }
   if (in_array($machineName, $entityTypes['node'])) {
