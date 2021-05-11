@@ -1,8 +1,8 @@
 # Api manager
 
-This drupal 8 & 9 module can be used to synchronize (add, update and remove automatically) JSON feeds without having to write any code. 
+This drupal 8 & 9 module can be used to synchronize (add, update and remove automatically) JSON feeds without having to write any code.
 
-All you have to do is map the fields or the origin with its destination via the interface. 
+All you have to do is map the fields or the origin with its destination via the interface.
 
 ![API manager drupal 8](https://i.imgur.com/qEYfy3H.jpg)
 
@@ -17,14 +17,14 @@ All you have to do is map the fields or the origin with its destination via the 
 
 #### Not included
 
-- Do not use this module if you would like to sync tens of thousands of items. It is meant for <b>small to medium-sized</b> datasets (e.g. up to 10.000). Nevertheless, you could give it a try. 
-- Authorisation. Deliberately we did <b>not include any type of authorisation</b>. This means server needs direct access to the JSON url. So if your data is behind some kind of security wall: create a custom controller to make your JSON available and let Api Manager handle the synchronisation. 
+- Do not use this module if you would like to sync tens of thousands of items. It is meant for <b>small to medium-sized</b> datasets (e.g. up to 10.000). Nevertheless, you could give it a try.
+- Authorisation. Deliberately we did <b>not include any type of authorisation</b>. This means server needs direct access to the JSON url. So if your data is behind some kind of security wall: create a custom controller to make your JSON available and let Api Manager handle the synchronisation.
 - Although it is possible to choose target language, <b>importing translations of a node are not possible</b>. Though it is possible to cross-link with entity reference.
 
 #### Future roadmap
 
 - We are planning to add a paging functionality as well,so feeds can be fully read (e.g. ?page=1, ?page=2). This is not included yet.
-- A more extended logging overview. 
+- A more extended logging overview.
 
 ## Getting started
 
@@ -37,7 +37,7 @@ With composer, add the following to your repositories:
         {
             "type": "package",
             "package": {
-                "name": "VITObelgium/api-manager",
+                "name": "vitobelgium/api-manager",
                 "version": "master",
                 "type":"drupal-module",
                 "source": {
@@ -50,7 +50,7 @@ With composer, add the following to your repositories:
      ]
 ```
 Then run the following
-```composer require VITObelgium/api-manager```.
+```composer require vitobelgium/api-manager```.
 
 Enable with drush:```drush en api_manager```
 
@@ -65,12 +65,12 @@ Label | Description | Value
 Label | The name of your API | ```string```<br>f.e. "Events"
 API url | The url of your feed | ```string```<br> Must be accessible by the server
 User id  | Id of the user who will be creator of the content | ```integer``` <br>Must be an id of a registered drupal user
-The content type or taxonomy to the API will create items for. | Choose the destination bundle of your feed (node or taxonomy) | ```string``` <br>Choose a value from the select list. 
+The content type or taxonomy to the API will create items for. | Choose the destination bundle of your feed (node or taxonomy) | ```string``` <br>Choose a value from the select list.
 Unique map field | The textfield on the destination content type where the api can store the unique id from the API items. | ```string``` <br>f.e. 'field_sync_id'. Its value after importing could for example become ``event_sync_845``
 Api object: unique id identifier | The id key or unique identifier of your import items. f.e. 'id', 'item_id', 'item_uuid'. The key should be available on each item of your import items.<br>If your json has items like ``{"item_id":845, ...}`` "item_id" would be this value. It is needed to synchronize the node/term and the json item. | ```string``` <br>f.e. 'item_id'
 Api object: updated date identifier | The updated time identifier of your import items. f.e. "updated", "updated_at". If your json is structured like ``{"item_id":845,"updated_at":2020-03-11T21:58:26.050+01:00"}``, then "updated_at" would be this value. | ```string``` <br>f.e. 'updated_at'
-Api object: parent item identifier (optional, for taxonomy only) | If you import hierarchical terms, here you can specify parent id of a term. | ```string``` f.e. 'parent_id' 
-The destination language of the nodes or terms | Choose the destination entity: conten type or taxonomy bundle |  ```string``` <br>Choose a value from the select list. 
+Api object: parent item identifier (optional, for taxonomy only) | If you import hierarchical terms, here you can specify parent id of a term. | ```string``` f.e. 'parent_id'
+The destination language of the nodes or terms | Choose the destination entity: conten type or taxonomy bundle |  ```string``` <br>Choose a value from the select list.
 Interval | The minimum amount of minutes between every sync. Set to 0 to import every cron run. Set to "-" if you do not want to trigger the import on cron and thus only on external trigger. | ```integer``` (to enable) ```string "-"``` (to disable) <br>Amount of minutes between every sync (depending on interval of your cronjob)
 Weight | The order in which the API should run. f.e. always give terms a lower weights because nodes can refer to them. | ```integer``` <br>Lower weight means earlier run
 Active | Is this import active or not | ```boolean``` <br>If disabled, items will never get imported.
@@ -91,4 +91,4 @@ Geolocation|Map your fields like this: lat_key+long_key&#124;content_type_field,
 
 ### Questions
 
-Use the GitHub issue queue to create an issue. You can directly contact our maintainer Stef at [stef.vanlooveren@vito.be](mailto:stefvanlooveren@vito.be). 
+Use the GitHub issue queue to create an issue. You can directly contact our maintainer Stef at [stef.vanlooveren@vito.be](mailto:stefvanlooveren@vito.be).
